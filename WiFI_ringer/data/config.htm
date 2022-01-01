@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ru">
+ <head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  
+  <script type="text/javascript" src="/function.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Настройки</title>
+  <link rel="shortcut icon" href="fav.ico" type="image/x-icon">
+  <script type="text/javascript">
+   var set_real_time;
+   function handleServerResponse(){
+    clearTimeout(set_real_time);
+    var res = jsonResponse.time.split(":");
+    real_time(hours=res[0],min=res[1],sec=res[2]);
+    document.body.style.backgroundColor="rgb("+jsonResponse.rgb+")";
+   }
+   function real_time(hours,min,sec) {
+   sec=Number(sec)+1;
+    if (sec>=60){min=Number(min)+1;sec=0;}
+    if (min>=60){hours=Number(hours)+1;min=0;}
+    if (hours>=24){hours=0};
+    document.getElementById("time").innerHTML = hours+":"+min+":"+sec;
+    set_real_time = setTimeout("real_time("+hours+","+min+","+sec+");", 1000);
+   }
+   function load_time(submit){
+    server = "/Time";
+    send_request(submit,server);
+    load();
+   }
+   function time_zone(submit){
+    server = "/TimeZone?timezone="+val('timezone');
+    send_request(submit,server);
+   }
+   function set_time_zone(submit){
+    var set_date = new Date();
+    var gmtHours = -set_date.getTimezoneOffset()/60;
+    document.getElementById('timezone').value = gmtHours;
+    server = "/TimeZone?timezone="+gmtHours;
+    send_request(submit,server);
+   }
+   function set_mdns(submit){
+    server = "/mdns?mdns="+val('mdns');
+    send_request(submit,server);
+    alert("Измененя вступят в силу после перезагрузки. Пожалуйта перезагрузите устройство.");
+   }
+   function set_ssid(submit){
+    server = "/ssid?ssid="+val('ssid')+"&password="+encodeURIComponent(val('password'));
+    send_request(submit,server);
+    alert("Измененя вступят в силу после перезагрузки. Пожалуйта перезагрузите устройство.");
+   }
+   function set_ssid_ap(submit){
+    server = "/ssidap?ssidAP="+val('ssidap')+"&passwordAP="+encodeURIComponent(val('passwordAp'));
+    send_request(submit,server);
+    alert("Измененя вступят в силу после перезагрузки. Пожалуйта перезагрузите устройство.");
+   }
+   function set_ssdp(submit){
+	server = "/logo?logo="+val('logo');
+    send_request(submit,server);
+	server = "/user1set?user1set="+val('user1');
+    send_request(submit,server);
+	server = "/user2set?user2set="+val('user2');
+    send_request(submit,server);
+	server = "/user3set?user3set="+val('user3');
+	send_request(submit,server);
+	server = "/keys?key1="+val('keys1')+"&key2="+val('keys2')+"&key3="+val('keys3')+"&key4="+val('keys4');
+    send_request(submit,server);
+	server = "/ssdp?ssdp="+val('ssdp');
+    send_request(submit,server);
+   }
+   function testvolume(submit,n){
+    server = "/play?play="+n;
+    send_request(submit,server);
+   }
+   function set_rf(submit){
+    server = "/rfset?code1="+val('code1')+"&code2="+val('code2')+"&code3="+val('code3')+"&code4="+val('code4');
+    send_request(submit,server);
+   }
+   function last_rf(submit){
+    server = "/rf";
+    send_request(submit,server);
+   }
+   function sendmessage(submit){
+    server = "/message?message="+val('message');
+    send_request(submit,server);
+   }
+   function setvolume(submit) {
+    server = "/volume?volume="+val('volh');
+	document.getElementById("volume1").innerHTML = val('volh');
+    send_request(submit,server);
+   }
+   function set_timers(submit){
+	server = "/timers?timeStart="+val('time_Start')+"&timeStop="+val('time_Stop');
+    send_request(submit,server);
+	}
+   function restart(submit,texts){
+    if (confirm(texts)) {
+	 server = "/restart?device=ok";
+     send_request(submit,server);
+     return true;
+    } else {
+     return false;
+    }
+   }
+   function modes(this_id,submit) {
+    document.getElementById(this_id).value = 1-val(this_id);
+    server = "/mode?tblynk="+val('tblynk')+"&tmdns="+val('tmdns');
+    send_request(submit,server);
+    }
+	function back(this_id) {
+	document.getElementById(this_id).value = 1-val(this_id);
+    }
+  </script>
+ </head>
+ <body onload="load();" background="/bg.jpg">
+  <h1>&#9874; Настройки</h1>
+ <div class="container">
+	<div>
+    <div  align="center" >
+	<div style="margin-bottom:40px;" class="tabs">
+		<input type="radio" name="inset" value="" id="tab_1" checked>
+		<label for="tab_1">&#128225; Подключение</label>
+		<input type="radio" name="inset" value="" id="tab_2">
+		<label for="tab_2">&#128337; Время</label>
+		<input type="radio" name="inset" value="" id="tab_3">
+		<label for="tab_3">&#128104; Организация</label>
+		<input type="radio" name="inset" value="" id="tab_4">
+		<label for="tab_4">&#128295; Система</label>
+		<input type="radio" name="inset" value="" id="tab_5">
+		<label for="tab_5">&#127873; Дополнительно</label>
+    <div id="txt_1">
+		<table >
+			<tr valign="top" >
+			<th width="50%">
+				<fieldset title="Укажите имя и пароль Вашей рабочей сети.">
+					<legend>Подключение к WiFi роутеру</legend>
+					<h7>Имя беспроводной сети </h7>
+					<input id="ssid" value="{{ssid}}" class="edit" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Имя WiFi сети">
+					<br>
+					<h7>Пароль для доступа к сети</h7>
+					<input id="password" value="{{password}}" pattern=".{8,15}" onfocus="this.type='text'" type="password" class="edit" placeholder="Пароль">
+					<input class="button" value="Сохранить &#128190;" onclick="set_ssid(this);" type="submit">
+				</fieldset>	
+			</th>
+			<th width="50%">
+				<fieldset  title="Здесь вы можете указать новое название WiFi точки и пароль.">
+					<legend>Параметры точки доступа</legend>
+					<h7>Имя точки доступа </h7>
+					<input id="ssidap" value="{{ssidAP}}" class="edit" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Имя WiFi сети">
+					<br>
+					<h7>Пароль точки доступа</h7>
+					<input id="passwordAp" value="{{passwordAP}}" pattern=".{8,15}" onfocus="this.type='text'" type="password" class="edit" placeholder="Пароль">
+					<input class="button" value="Сохранить &#128190;" onclick="set_ssid_ap(this);" type="submit">
+				</fieldset>		
+			</th>	
+			</tr>	
+			<tr valign="top">
+			<th>
+				<fieldset title="Укажите имя mDNS">
+					<legend>Настройка mDNS </legend>
+					<input id="mdns" value="{{MDNS}}" class="edit" pattern="[0-9a-zA-Z.]{1,55}" placeholder="ВВедите имя mDNS ">
+					<br>
+					<h7>Для доступа к устройству ввести в адресной строке: <имя_mDNS>.local </h7>
+					<br>
+					<input class="button" value="Сохранить &#128190;" onclick="set_mdns(this);" type="submit">
+				</fieldset>	
+			</th>
+			<th >
+				<fieldset  title="Дополнительные параметры подключения">
+					<legend>Дополнительные параметры</legend>
+					<h7>Локальный адресс: {{ip}} </h7>
+					<br>
+					<h7>IP адресс пульта управления: {{client}}</h7>
+				</fieldset>		
+			</th>	
+			</tr>			
+		</table>
+	</div>
+    <div id="txt_2">
+		<table>
+			<tr valign="top" >
+			<th width="50%">
+				<fieldset>
+					<legend>Настройка часового пояса</legend>
+						<div height="100%">
+							<h7>Часовой пояс</h7>
+							<input id="timezone" value="{{timezone}}" pattern="[0-9]{1,3}" class="edit">
+							<br>
+							<input class="button" value="Сохранить &#128190;" onclick="time_zone(this);" type="submit">
+						</div>
+				</fieldset>
+			</th>
+			<th width="50%"> 
+				<fieldset>
+					<legend>Время в сети</legend>
+						<h7>На устройстве сейчас <strong id="time">{{time}}</strong></h7>
+						<input class="button button_orange" value="Авто определение &#127759;" onclick="set_time_zone(this);" type="submit">
+						<input class="button button_orange" value="Синхронизировать &#128259;" onclick="load_time(this);" type="submit">
+				</fieldset>
+			</th>
+			</tr>
+		<tr>
+		<th colspan="2">
+		<fieldset>
+			<legend>Установка служебных таймеров</legend>
+				<table>
+					<tr valign="top">
+					<th width="50%">
+						<h7>Начало рабочего дня</h7>
+						<input type="time" class="edit" id="time_Start"  value="{{timeStart}}">
+					</th>
+					<th width="50%">
+						<h7>Конец рабочего дня </h7>
+						<input type="time" class="edit" id="time_Stop" value="{{timeStop}}">
+					</th>
+					</tr>
+				</table>
+				<input class="button" value="Сохранить &#128190;" onclick="set_timers(this);" type="submit">
+		</fieldset>
+		</th>
+		</tr>
+		</table>
+	</div>
+    <div id="txt_3">
+		<fieldset title="Укажите название Вашей организации и укажите путь к логотипу.">
+			<legend>Организация</legend>
+			<h7>Название организации</h7>
+			<br>
+			<input id="ssdp" value="{{SSDP}}" class="edit"  placeholder="Название организации">
+			<br>
+			<h7>Логотип</h7>
+			<br>
+			<input id="logo" value="{{logo}}" class="edit"  placeholder="Путь к логотипу организации">
+		</fieldset>
+		<fieldset title="Необходимо указать путь к фото сотрудника, размещенного на стороннем ресурсе и выбрать мелодию оповещения">
+			<legend>Фото сотрудников</legend>
+			<table>
+				<tr valign="top" align="center" class="table-border">
+				<th>
+					<h7>Сотрудник - 1</h7>
+					<br><input id="user1" value="{{user1}}" class="edit" placeholder="Сотрудник - 1">
+					
+				</th>
+				<th width="20%">
+					<input type="number" class="edit" name=keys1 min="1" max="999" id="keys1"  value="{{key1}}">
+					Текущий звук:{{key1}}
+					<br>
+					<button class="button button_shadow" onclick="testvolume(this,keys1.value);"><span>Прослушать</span></button>
+				</th>
+				<tr valign="top" align="center" class="table-border">
+				<th>
+					<br><h7>Сотрудник - 2</h7>
+					<br><input id="user2" value="{{user2}}" class="edit" placeholder="Сотрудник - 2">
+				</th>
+				<th>
+					<input type="number" class="edit"  name=keys2 min="1" max="999" id="keys2"  value="{{key2}}">
+					Текущий звук:{{key2}}
+					<br>
+					<button class="button button_shadow" onclick="testvolume(this,keys2.value);"><span>Прослушать</span></button>
+				</th>
+				<tr valign="top" align="center" class="table-border">
+				<th>
+					<br><h7>Сотрудник - 3</h7>
+					<br><input id="user3" value="{{user3}}" class="edit" placeholder="Сотрудник - 3">
+				</th>
+				<th>
+					<input type="number" class="edit" name=keys3 min="1" max="999" id="keys3"  value="{{key3}}">
+					Текущий звук:{{key3}}
+					<br>
+					<button class="button button_shadow" onclick="testvolume(this,keys3.value);"><span>Прослушать</span></button>
+				</th>	
+				<tr valign="top" align="center">
+				<th>
+					<br><h7>Отмена</h7>
+					<br><h7>Здесь необходимо выбрать звук отмены вызова:</h7>
+				</th>
+				<th>
+					<input type="number" class="edit" name=keys3 min="1" max="999" id="keys4"  value="{{key4}}">
+					Текущий звук:{{key4}}
+					<br>
+					<button class="button button_shadow" onclick="testvolume(this,keys4.value);"><span>Прослушать</span></button>
+				</th>	
+			</table>
+		</fieldset>	
+		<input class="button" value="Сохранить &#128190;" onclick="set_ssdp(this);" type="submit">
+		
+    </div>
+    <div id="txt_4">
+		<fieldset  title="Настройка громкости звука">
+			<legend>Громкость звука: <strong id="volume1">{{volume}}</strong> </legend>
+		<h7>Громкость звуков: <strong id="volume1">{{volume}}</strong></h7>
+		<table>
+		<tr>
+			<th width="50%">
+				<input type="range" class="button" min="1" max="30" id="volh" OnChange="setvolume()" value="{{volume}}">
+			</th>
+			<th width="50%">
+				<input class="button button_orange" value="Тест громкости &#128226;" onclick="testvolume(this,98);">
+			</th>
+		</tr>
+		</table>
+		</fieldset>	
+		<fieldset  title="Здесь вы можете указать коды пульта радиоуправления">
+			<legend>Коды кнопок пульта RF</legend>
+					<h7>Кнопка 1 </h7>
+					<input id="code1" value="{{code1}}" class="edit" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Код кнопки пульта 1">
+					<br>
+					<h7>Кнопка 2 </h7>
+					<input id="code2" value="{{code2}}" class="edit" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Код кнопки пульта 2">
+					<br>
+					<h7>Кнопка 3 </h7>
+					<input id="code3" value="{{code3}}" class="edit" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Код кнопки пульта 3">
+					<br>
+					<h7>Кнопка 4 </h7>
+					<input id="code4" value="{{code4}}" class="edit" pattern="[0-9a-zA-Z.]{1,15}" placeholder="Код кнопки пульта 4">
+					<br>
+					<input class="button" value="Последний код" onclick="last_rf(this);" type="submit">
+					<input class="button" value="Сохранить &#128190;" onclick="set_rf(this);" type="submit">
+		</fieldset>	
+
+		<hr>
+				<a class="button button_orange" href="/">Главная страница</a>
+		<br>
+				<a class="button button_red" href="/update">Обновить прошивку &#128259;</a>
+		<hr>
+				<input class="button button_red" value="Перезагрузить устройство" onclick="restart(this,'Вы действительно хотите перезагрузить устройство?');" type="submit">
+    </div>
+	<div id="txt_5">
+		<fieldset title="Выбор параметров работы колонки">
+			<legend>Сетевые натройки</legend>
+			<table align="center" frame="hsides" border="2px">
+				<tr>
+					<th width="100px">
+						<input id="tblynk" type="range" class="range" min="0" max="1" value="{{tblynk}}" OnClick="modes(this.id)" OnChange="back(this.id)">
+					</th>
+					<th>
+						<h7>Разрешить работу сервиса BYNK</h7>
+					</th>
+				</tr>
+				<tr>
+					<th>
+						<input id="tmdns" type="range" class="range" min="0" max="1" value="{{tmdns}}" OnClick="modes(this.id)" OnChange="back(this.id)">
+					</th>
+					<th>
+						<h7>Разрешить работу сервиса MDNS</h7>
+					</th>
+				</tr>
+			</table>
+		</fieldset>	
+	</div>
+	</div>
+    </div>
+   </div>
+   </div>  
+ </body>
+</html>

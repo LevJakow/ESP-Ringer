@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+ <head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  <script type="text/javascript" src="/function.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>"Вызов мастера"</title>
+  <link rel="shortcut icon" href="/fav.ico" type="image/x-icon">
+  <script type="text/javascript">
+   function Tuser(submit,n){
+    server = "/play?play="+n;
+    send_request(submit,server);
+   }
+
+  </script>
+ </head>
+ <body onload="load();" background="/bg.jpg">
+  <div class="container">
+   <div class="row" style="text-align:center;">
+   <table align="center" height="60%" cellpadding = 10>
+		<tr>
+			<td>
+				<img width="40%" src="{{logo}}">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div style="background: #ff0000;font-size: 24; color: #ffffff; width = "100%">Вызов мастера</div>
+			</td>
+		</tr>
+		</table>
+	<table align="center" class="shadows" height="60%" cellpadding = 10>
+		<tr>
+			<td width="33%">
+				<input width = "90%" src="{{user1}}" onclick="Tuser(this,{{key1}});" type="image">
+			</td>
+			<td width="32%">
+				<input width = "90%" src="{{user2}}" onclick="Tuser(this,{{key2}});" type="image">
+			</td>
+			<td width="32%">
+				<input width = "90%" src="{{user3}}" onclick="Tuser(this,{{key3}});" type="image">
+			</td>
+		</tr>
+		</table>
+	<table align="center"cellpadding = 10>
+		<tr>
+			<td>
+			<a class="button button_orange" href="/">Обновить</a>
+			</td>
+			<td>
+			<a class="button button_orange" href="/config.htm">Настройки</a>
+			</td>
+		</tr>
+	</table>
+	
+    </div>
+   </div>
+ </body>
+</html>
